@@ -1,5 +1,6 @@
 import app from 'firebase/app'
 import 'firebase/auth'
+import 'firebase/database'
 import FirebaseContext from './context'
 
 const config = {
@@ -11,12 +12,12 @@ const config = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
 }
 
-console.log(config)
 class Firebase {
   constructor() {
     app.initializeApp(config)
 
     this.auth = app.auth()
+    this.db = app.database()
   }
 
   // *** Auth API ***
@@ -32,6 +33,10 @@ class Firebase {
   doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email)
   doPasswordUpdate = (password) =>
     this.auth.currentUser.updatePassword(password)
+
+  user = (uid) => this.db.ref(`users/${uid}`)
+
+  users = () => this.db.ref('users')
 }
 
 export const withFirebase = (Component) => (props) =>

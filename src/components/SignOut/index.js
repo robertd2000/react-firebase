@@ -8,8 +8,6 @@ export const SignOutButtonBase = ({ firebase }) => {
   }
   return (
     <>
-      {console.log(firebase)}
-
       <button type="button" onClick={clickHandle}>
         Sign Out
       </button>

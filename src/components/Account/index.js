@@ -5,7 +5,6 @@ import { withAuthorization, AuthUserContext } from '../Session'
 const AccountPage = () => (
   <AuthUserContext.Consumer>
     {(authUser) => {
-      console.log(authUser)
       return (
         <div>
           <h1>Account: {authUser.authUser.email}</h1>

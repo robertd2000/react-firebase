@@ -29,6 +29,9 @@ const NavigationAuth = () => {
         <Link to={ACCOUNT}>Account</Link>
       </li>
       <li>
+        <Link to={ADMIN}>Admin</Link>
+      </li>
+      <li>
         <SignOut />
       </li>
     </ul>
