@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { withFirebase } from '../Firebase'
+import { compose } from 'recompose'
+import { ADMIN } from '../../constants/roles'
+import { withAuthorization } from '../Session'
+
 const AdminPage = ({ firebase }) => {
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState([])
@@ -27,9 +31,9 @@ const AdminPage = ({ firebase }) => {
   return (
     <div>
       <h1>Admin</h1>
-
+      <p>The Admin Page is accessible by every signed in admin user.</p>
       {loading && <div>Loading...</div>}
-
+      {console.log(users)}
       <UserList users={users} />
     </div>
   )
@@ -37,27 +41,38 @@ const AdminPage = ({ firebase }) => {
 
 const UserList = ({ users }) => (
   <ul>
-    {users.map((user) => (
-      <li key={user.uid}>
-        <span>
-          <strong>ID:</strong> {user.uid}
-        </span>
-        <span>
-          <strong>E-Mail:</strong> {user.email}
-        </span>
-        <span>
-          <strong>Username:</strong> {user.username}
-        </span>
-      </li>
-    ))}
+    {users
+      ? users.map((user) => (
+          <li key={user.uid}>
+            <span>
+              <strong>ID:</strong> {user.uid}
+            </span>
+            <span>
+              <strong>E-Mail:</strong> {user.email}
+            </span>
+            <span>
+              <strong>Username:</strong> {user.username}
+            </span>
+          </li>
+        ))
+      : 'no data'}
   </ul>
 )
 
-export default withFirebase(AdminPage)
+const condition = (authUser) => {
+  console.log(authUser)
+  return authUser && authUser.authUser
+    ? authUser?.authUser.roles?.includes(ADMIN)
+    : authUser?.roles?.includes(ADMIN)
+}
+export default compose(withAuthorization(condition), withFirebase)(AdminPage)
 
 // import React, { Component } from 'react'
+// import { compose } from 'recompose'
 
 // import { withFirebase } from '../Firebase'
+// import { withAuthorization } from '../Session'
+// import * as ROLES from '../../constants/roles'
 
 // class AdminPage extends Component {
 //   constructor(props) {
@@ -94,11 +109,10 @@ export default withFirebase(AdminPage)
 //   render() {
 //     const { users, loading } = this.state
 
-//     console.log(users)
-
 //     return (
 //       <div>
 //         <h1>Admin</h1>
+//         <p>The Admin Page is accessible by every signed in admin user.</p>
 
 //         {loading && <div>Loading ...</div>}
 
@@ -126,4 +140,11 @@ export default withFirebase(AdminPage)
 //   </ul>
 // )
 
-// export default withFirebase(AdminPage)
+// const condition = (authUser) => {
+//   console.log(authUser)
+//   return authUser && authUser.authUser
+//     ? authUser?.authUser.roles?.includes(ROLES.ADMIN)
+//     : authUser?.roles?.includes(ROLES.ADMIN)
+// }
+
+// export default compose(withAuthorization(condition), withFirebase)(AdminPage)

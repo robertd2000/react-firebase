@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import * as ROLES from '../../constants/roles'
+
 import {
   ACCOUNT,
   ADMIN,
@@ -10,13 +12,15 @@ import {
 } from '../../constants/routes'
 import { AuthUserContext } from '../Session'
 import SignOut from '../SignOut'
-const Navigation = ({ authUser }) => (
+const Navigation = () => (
   <AuthUserContext.Consumer>
-    {(authUser) => (authUser ? <NavigationAuth /> : <NavigationNonAuth />)}
+    {(authUser) =>
+      authUser ? <NavigationAuth authUser={authUser} /> : <NavigationNonAuth />
+    }
   </AuthUserContext.Consumer>
 )
 
-const NavigationAuth = () => {
+const NavigationAuth = ({ authUser }) => {
   return (
     <ul>
       <li>
@@ -28,9 +32,14 @@ const NavigationAuth = () => {
       <li>
         <Link to={ACCOUNT}>Account</Link>
       </li>
-      <li>
-        <Link to={ADMIN}>Admin</Link>
-      </li>
+      {authUser &&
+        authUser.authUser.roles &&
+        authUser.authUser.roles.includes(ROLES.ADMIN) && (
+          <li>
+            <Link to={ADMIN}>Admin</Link>
+          </li>
+        )}
+
       <li>
         <SignOut />
       </li>
