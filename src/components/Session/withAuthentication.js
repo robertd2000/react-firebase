@@ -10,7 +10,7 @@ const withAuthentication = (Component) => {
     useEffect(() => {
       const listener = props.firebase.onAuthUserListener(
         (authUser) => {
-          setAuthUser({ authUser })
+          setAuthUser(authUser)
         },
         () => {
           setAuthUser(null)

@@ -15,9 +15,12 @@ const config = {
 class Firebase {
   constructor() {
     app.initializeApp(config)
-
+    this.emailAuthProvider = app.auth.EmailAuthProvider
     this.auth = app.auth()
     this.db = app.database()
+    this.googleProvider = new app.auth.GoogleAuthProvider()
+    this.facebookProvider = new app.auth.FacebookAuthProvider()
+    this.twitterProvider = new app.auth.TwitterAuthProvider()
   }
 
   // *** Auth API ***
@@ -45,7 +48,6 @@ class Firebase {
           .once('value')
           .then((snapshot) => {
             const dbUser = snapshot.val()
-
             // default empty roles
             if (!dbUser.roles) {
               dbUser.roles = []
@@ -64,6 +66,10 @@ class Firebase {
         fallback()
       }
     })
+
+  doSignInWithGoogle = () => this.auth.signInWithPopup(this.googleProvider)
+  doSignInWithFacebook = () => this.auth.signInWithPopup(this.facebookProvider)
+  doSignInWithTwitter = () => this.auth.signInWithPopup(this.twitterProvider)
 }
 
 export const withFirebase = (Component) => (props) =>

@@ -33,7 +33,6 @@ const AdminPage = ({ firebase }) => {
       <h1>Admin</h1>
       <p>The Admin Page is accessible by every signed in admin user.</p>
       {loading && <div>Loading...</div>}
-      {console.log(users)}
       <UserList users={users} />
     </div>
   )
@@ -60,10 +59,7 @@ const UserList = ({ users }) => (
 )
 
 const condition = (authUser) => {
-  console.log(authUser)
-  return authUser && authUser.authUser
-    ? authUser?.authUser.roles?.includes(ADMIN)
-    : authUser?.roles?.includes(ADMIN)
+  return authUser && authUser.roles.includes(ADMIN)
 }
 export default compose(withAuthorization(condition), withFirebase)(AdminPage)
 

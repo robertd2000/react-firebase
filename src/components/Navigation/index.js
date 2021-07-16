@@ -32,13 +32,11 @@ const NavigationAuth = ({ authUser }) => {
       <li>
         <Link to={ACCOUNT}>Account</Link>
       </li>
-      {authUser &&
-        authUser.authUser.roles &&
-        authUser.authUser.roles.includes(ROLES.ADMIN) && (
-          <li>
-            <Link to={ADMIN}>Admin</Link>
-          </li>
-        )}
+      {authUser && authUser.roles.includes(ROLES.ADMIN) && (
+        <li>
+          <Link to={ADMIN}>Admin</Link>
+        </li>
+      )}
 
       <li>
         <SignOut />
