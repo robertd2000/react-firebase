@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { withFirebase } from '../Firebase'
 import { compose } from 'recompose'
-import { ADMIN } from '../../constants/roles'
-import { withAuthorization } from '../Session'
+import { ADMIN as ADMIN_ROLE } from '../../constants/roles'
+import { withAuthorization, withEmailVerification } from '../Session'
+import { ADMIN_DETAILS, ADMIN } from '../../constants/routes'
+import { Link, Route, Switch } from 'react-router-dom'
 
-const AdminPage = ({ firebase }) => {
+const AdminPage = () => (
+  <div>
+    <h1>Admin</h1>
+    <p>The Admin Page is accessible by every signed in admin user.</p>
+    <Switch>
+      <Route exact path={ADMIN_DETAILS} component={UserItem} />
+      <Route exact path={ADMIN} component={UserList} />
+    </Switch>
+  </div>
+)
+
+const UserListBase = ({ firebase }) => {
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState([])
 
@@ -30,38 +43,107 @@ const AdminPage = ({ firebase }) => {
   }, [])
   return (
     <div>
-      <h1>Admin</h1>
-      <p>The Admin Page is accessible by every signed in admin user.</p>
+      <h1>Users: </h1>
+
       {loading && <div>Loading...</div>}
-      <UserList users={users} />
+
+      <UsersList users={users} />
     </div>
   )
 }
 
-const UserList = ({ users }) => (
-  <ul>
-    {users
-      ? users.map((user) => (
-          <li key={user.uid}>
-            <span>
-              <strong>ID:</strong> {user.uid}
-            </span>
-            <span>
-              <strong>E-Mail:</strong> {user.email}
-            </span>
-            <span>
-              <strong>Username:</strong> {user.username}
-            </span>
-          </li>
-        ))
-      : 'no data'}
-  </ul>
-)
+const UsersList = ({ users }) => {
+  console.log(users)
+  return (
+    <ul>
+      {users
+        ? users.map((user) => (
+            <li key={user.uid}>
+              <span>
+                <strong>ID:</strong> {user.uid}
+              </span>
+              <span>
+                <strong>E-Mail:</strong> {user.email}
+              </span>
+              <span>
+                <strong>Username:</strong> {user.username}
+              </span>
+              <span>
+                {/* <Link to={`${ADMIN}/${user.uid}`}>Details</Link> */}
+                <Link
+                  to={{
+                    pathname: `${ADMIN}/${user.uid}`,
+                    state: { user },
+                  }}
+                >
+                  Details
+                </Link>
+              </span>
+            </li>
+          ))
+        : 'no data'}
+    </ul>
+  )
+}
+
+const UserItemBase = (props) => {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [state, setState] = useState(props.location.state)
+
+  useEffect(() => {
+    if (state) return
+    setLoading(true)
+
+    props.firebase.user(props.match.params.id).on('value', (snapshot) => {
+      setUser(snapshot.val())
+      setLoading(false)
+    })
+
+    return () => props.firebase.user(props.match.params.id).off()
+  }, [])
+
+  const onSendPasswordResetEmail = () => {
+    props.firebase.doPasswordReset(user.email)
+  }
+
+  return (
+    <div>
+      <h2>User ({props.match.params.id})</h2>
+      {loading && <div>Loading ...</div>}
+
+      {user && (
+        <div>
+          <span>
+            <strong>ID:</strong> {user.uid}
+          </span>
+          <span>
+            <strong>E-Mail:</strong> {user.email}
+          </span>
+          <span>
+            <strong>Username:</strong> {user.username}
+          </span>
+          <span>
+            <button type="button" onClick={onSendPasswordResetEmail}>
+              Send Password Reset
+            </button>
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const condition = (authUser) => {
-  return authUser && authUser.roles.includes(ADMIN)
+  return authUser && authUser.roles.includes(ADMIN_ROLE)
 }
-export default compose(withAuthorization(condition), withFirebase)(AdminPage)
+
+const UserList = withFirebase(UserListBase)
+const UserItem = withFirebase(UserItemBase)
+export default compose(
+  withAuthorization(condition)
+  // withEmailVerification
+)(AdminPage)
 
 // import React, { Component } from 'react'
 // import { compose } from 'recompose'

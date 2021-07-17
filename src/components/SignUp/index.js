@@ -52,6 +52,9 @@ const SignUpFormBase = ({ firebase, history }) => {
         })
       })
       .then(() => {
+        return firebase.doSendEmailVerification()
+      })
+      .then(() => {
         setState({ ...INITIAL_STATE })
         history.push(HOME)
       })
