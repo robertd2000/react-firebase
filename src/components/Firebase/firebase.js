@@ -21,6 +21,7 @@ class Firebase {
     this.googleProvider = new app.auth.GoogleAuthProvider()
     this.facebookProvider = new app.auth.FacebookAuthProvider()
     this.twitterProvider = new app.auth.TwitterAuthProvider()
+    this.serverValue = app.database.ServerValue
   }
 
   // *** Auth API ***
@@ -77,6 +78,9 @@ class Firebase {
     this.auth.currentUser.sendEmailVerification({
       url: process.env.REACT_APP_CONFIRMATION_EMAIL_REDIRECT,
     })
+
+  message = (uid) => this.db.ref(`messages/${uid}`)
+  messages = () => this.db.ref(`messages`)
 }
 
 export const withFirebase = (Component) => (props) =>
